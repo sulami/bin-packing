@@ -1,4 +1,4 @@
-//! Offline packing strategies for bin packing.
+//! Offline bin packing strategies.
 //!
 //! Offline strategies have access to all items in advance and can optimize the packing process
 //! accordingly.
