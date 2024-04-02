@@ -75,16 +75,16 @@ impl Strategy for ModifiedFirstFitDecreasing {
         let mut idx = 0;
         for large_item in large {
             loop {
-                if large_item.size() < bins[idx].available() {
-                    bins[idx].pack(large_item);
-                    break;
-                }
-                idx += 1;
                 if idx == bins.len() {
                     bins.push(Default::default());
                     bins.last_mut().unwrap().pack(large_item);
                     break;
                 }
+                if large_item.size() < bins[idx].available() {
+                    bins[idx].pack(large_item);
+                    break;
+                }
+                idx += 1;
             }
         }
 
