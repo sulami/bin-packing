@@ -96,6 +96,60 @@ impl Strategy for BestFit {
     }
 }
 
+/// An online strategy that packs items into the bin with the most available capacity.
+pub struct WorstFit;
+impl Strategy for WorstFit {
+    fn next_idx(&self, bins: &[impl Bin], item: &impl Item) -> Option<usize> {
+        let mut worst_fit = None;
+        for (i, bin) in bins.iter().enumerate() {
+            if item.size() <= bin.available() {
+                match worst_fit {
+                    None => worst_fit = Some(i),
+                    Some(j) => {
+                        if bins[j].available() < bin.available() {
+                            worst_fit = Some(i);
+                        }
+                    }
+                }
+            }
+        }
+        worst_fit
+    }
+}
+
+/// An online strategy that packs items into the second most empty bin, falling back to the most
+/// empty one.
+pub struct AlmostWorstFit;
+impl Strategy for AlmostWorstFit {
+    fn next_idx(&self, bins: &[impl Bin], item: &impl Item) -> Option<usize> {
+        let mut worst_fit = None;
+        let mut almost_worst_fit = None;
+        for (i, bin) in bins.iter().enumerate() {
+            if item.size() <= bin.available() {
+                match (worst_fit, almost_worst_fit) {
+                    (None, _) => worst_fit = Some(i),
+                    (Some(j), None) => {
+                        if bins[j].available() < bin.available() {
+                            almost_worst_fit = Some(i);
+                        } else {
+                            worst_fit = Some(i);
+                        }
+                    }
+                    (Some(j), Some(k)) => {
+                        if bins[j].available() < bin.available() {
+                            almost_worst_fit = Some(j);
+                            worst_fit = Some(i);
+                        } else if bins[k].available() < bin.available() {
+                            almost_worst_fit = Some(i);
+                        }
+                    }
+                }
+            }
+        }
+        almost_worst_fit.or(worst_fit)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
