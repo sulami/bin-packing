@@ -2,3 +2,11 @@
 name = "bin-packing"
 version = "0.1.0"
 edition = "2021"
+
+[dev_dependencies]
+criterion = "0.5"
+rand = "0.8"
+
+[[bench]]
+name = "bench"
+harness = false
